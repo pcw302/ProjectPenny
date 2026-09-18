@@ -55,26 +55,21 @@ def make_decks(seed: int, n_decks: int) -> np.ndarray:
     
     return decks
 
-def save_decks_jsonl(decks: np.ndarray, seed: int) -> Path:
+def save_decks_npy(decks: np.ndarray, seed: int) -> Path:
     """
-    Saves the generated 2D array of decks into a JSON Lines (.jsonl) file using Pandas.
-    Each line represents a single simulated deck object: {"deck": [0, 1, ...]}
+    Saves the 2D array of decks directly to a binary NumPy (.npy) file.
     """
     PATH_DECKS.mkdir(parents=True, exist_ok=True)
     n_decks, n_cards = decks.shape
-    filename = PATH_DECKS / f'decks_{n_decks}x{n_cards}_seed{seed}.jsonl'
+    filename = PATH_DECKS / f'decks_{n_decks}x{n_cards}_seed{seed}.npy'
     
     print(f"Saving {n_decks:,} decks to {filename}...")
-    
-    # Wrap array into a single-column DataFrame and write via optimized C routines
-    df = pd.DataFrame({'deck': decks.tolist()})
-    df.to_json(filename, orient='records', lines=True)
-            
+    np.save(filename, decks)
     print("Save complete!")
+    
     return filename
 
 if __name__ == "__main__":
-    # Quick test to ensure everything works
     current_seed = get_next_seed()
     simulated_decks = make_decks(seed=current_seed, n_decks=5)
-    save_decks_jsonl(decks=simulated_decks, seed=current_seed)
+    save_decks_npy(decks=simulated_decks, seed=current_seed)
