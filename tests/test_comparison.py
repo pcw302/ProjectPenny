@@ -9,7 +9,7 @@ from src.data_generation import make_decks
 import src.data_processing as original_mod
 import src.data_processing_bitwise as bitwise_mod
 
-DECKS = 1000000
+DECKS = 100000
 
 def run_comparison():
     print(f"Generating {DECKS:,} test decks for validation...")

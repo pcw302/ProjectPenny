@@ -65,7 +65,7 @@ def init_results_dict() -> dict:
 
 def process_deck(deck: np.ndarray, results: dict) -> None:
     """Evaluates one deck across all 56 valid matchups using bitwise windows."""
-    # Pre-calculate 50 3-bit window integers in C-speed via NumPy vectorization
+    # Pre-calculate 50 3-bit window integers
     windows = (deck[:-2] << 2) | (deck[1:-1] << 1) | deck[2:]
 
     for p1_choice in PATTERNS:

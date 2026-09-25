@@ -10,14 +10,13 @@ from src.visualization import plot_heatmaps
 
 def display_menu() -> None:
     """Displays available menu choices to the user."""
-    print("\nHumble-Nishiyama Randomness Game")
     print("--------------------------------")
     print("1. Display current heatmaps")
     print("2. Simulate additional decks")
     print("3. Exit")
 
 def handle_simulation() -> None:
-    """Prompt user for deck count, generate, and process decks with bitwise engine."""
+    """Prompt user for deck count, generate, and process decks."""
     user_input = input("Enter number of decks to simulate (e.g. 1000): ").strip()
     if not user_input.isdigit() or int(user_input) <= 0:
         print("Invalid deck count. Please enter a positive integer.")
@@ -29,7 +28,7 @@ def handle_simulation() -> None:
     decks = make_decks(seed=seed, n_decks=num_decks)
     filepath = save_decks_npy(decks=decks, seed=seed)
 
-    print(f"[2/2] Processing decks using bitwise engine...")
+    print(f"[2/2] Processing decks...")
     total_processed = process_all_decks()
     print(f"Success! Total accumulated decks in database: {total_processed:,}")
 
