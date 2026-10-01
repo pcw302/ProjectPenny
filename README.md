@@ -18,17 +18,27 @@ The Penney Game is a game based on flipping a coin multiple times. Each player c
 
 ### Version 1 
 
+Version 1 is based on tricks, where the winning player receives a point for winning the pile.
+
 ### Version 2 
+
+Version 2 is based on cards, where the win is determined by the amount of cards each player has at the end of the deck.
 
 ## Purpose of Investigation 
 
-The main purpose of our investigation is to compare the strategies and winning probabilies of the two version 
+The main purpose of our investigation is to compare the strategies and winning probabilities of the two version 
 
 ## How to Run our Code
 
+By running our main.py file from the command line in the of the project you will be given 4 options;
+First is to run the entire pipeline, creating new decks, processing them and then putting the results into a heat map returned at the end of the function call.
+Option 2 is to recalculate the winning percentages for all existing decks from scratch, mainly for debugging 
+Option 3 is to just return the existing heat map
+Option 4 is to exit
+
 ## Data Module: DataGeneration.py
 
-This module creates the "decks" and writes them to a JSON Lines file.
+This module creates the "decks" and writes them to a numpy binary file.
 
 ### How It Works
 
@@ -42,27 +52,27 @@ This module creates the "decks" and writes them to a JSON Lines file.
 
 
 
-### File Storage (`save_decks_jsonl`)
-
-After evaluating the best compromise between storage efficiency and readability, JSON Lines (`.jsonl`) was selected to store the decks.
-
-`save_decks_jsonl` takes in the 2D deck matrix and the `seed`:
+### File Storage (`numpy binary`)
+The decks are saved as numpy binary files allowing streaming of data into memory as bits instead of having to load the entire file at once.
 
 1. **Directory Setup**: Ensures the correct directory structure exists; if not, it creates it.
 2. **Dimension Extraction**: Gets the shape of the matrix with `decks.shape` to extract `n_decks` and `n_cards`. The card count defaults to 52, but it is not hardcoded in case project requirements change later.
 3. **Dynamic Filenames**: Embeds the matrix dimensions directly into the filename to make troubleshooting easy.
-4. **Data Transformation**: Converts the 2D NumPy array into a list of lists so that it can be read into a JSON format through Pandas.
-5. **Pandas Optimization**: Uses Pandas to read/write JSON Lines instead of built-in Python libraries because Pandas is written in low-level C. This speeds up operations when processing millions of values.
-6. **DataFrame Wrapping**: Converts the list of lists into a DataFrame where `"deck"` is the column name and each row contains the full deck array.
-7. **JSON Lines Output**: Uses `df.to_json()` to convert the DataFrame into a `.jsonl` file while treating every entry as a key-value JSON object.
+4. **Numpy Binary**: Saves the matrix using the np.save function and chunks them based on the file size, anything larger then 45MB being split into a different file.
 
-## Data Module: data_processing.py and data_processing_bitwise.py
 
-### data_processing.py 
-
-### data_processing_bitwise.py
+## Data Module: data_processing_bitwise.py
+Cards are represented as binary values, either 0 or one corresponding to black or read, this allows each possible pattern to be encoded as a 3 bit integer 0-7. 
+We stream in the decks which are saved as numpy binary files, we then take each deck and calculate all the possible 3 bit windows in that deck, which are turned into integer values (0-7) and stored in an array
+We then loop through the array of values and check to see which corresponds with the selected patterns and score accordingly. These values are then written into a results_bitwise.csv file to be read by the visualization module.
+We also only load and calculate the results for the newly generated decks, to improve efficiency.
 
 
 ## Data Module: visualization.py 
+Read out of the results_bitwise.csv to get data on wins and losses
+Once read into a pandas data frame, various dataframe operations are performed in order to get the data in the right format to be read by seaborn then output by matplotlib
+The most recent heatmap is saved to the figures directory and is over-written when a new plot is generated.
 
 ## Findings
+The biggest finding from our results is that the game is heavily skewed towards player 2, infact in both variations, it is nearly statistically impossible for player 1 to win if player 2 chooses the correct pattern.
+If your opponent chooses X1 X2 X3 , you can nearly guarantee a win or tie by choosing Not X2, X1, X2. Also in Rons variation becuase your are scoring by cards instead of tricks, ties are much less likely. 
